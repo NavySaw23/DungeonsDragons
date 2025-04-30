@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { protect } = require('../middleware/authMiddleware'); // Import protect middleware
 
 // --- Standard Registration ---
 // @route   POST api/auth/register
@@ -159,9 +160,12 @@ router.post('/logout', (req, res) => {
 });
 
 // --- Get Current User ---
-router.get('/me', async (req, res) => {
+// @route   GET api/auth/me
+// @desc    Get current user data based on token
+// @access  Private
+router.get('/me', protect, async (req, res) => { // Add protect middleware here
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.user.id).select('-password'); // Now req.user should be populated
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }

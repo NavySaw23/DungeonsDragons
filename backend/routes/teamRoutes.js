@@ -9,7 +9,10 @@ const User = require('../models/User');
 // @access  Private
 router.get('/me', protect, async (req, res) => {
   try {
-    const team = await Team.findOne({ members: req.user._id }).populate('members', 'username email role');
+    // Populate members and mentor details
+    const team = await Team.findOne({ members: req.user._id })
+      .populate('members', 'username email role') // Populate member details
+      .populate('mentorId', 'username'); // Populate mentor's username if mentorId exists
     if (!team) {
       console.log('User is not part of any team'); // Debug log
       return res.status(404).json({ msg: 'You are not part of any team' });
