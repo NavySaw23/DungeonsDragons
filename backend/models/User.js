@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+const playerClasses = ['Adventurer', 'Warrior', 'Mage', 'Thief', 'Healer', 'Captain', 'Guild Master'];
+
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -26,14 +28,36 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['student', 'admin'],
+    enum: ['student', 'admin', 'mentor', 'coordinator'],
     default: 'student'
   },
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: () => new mongoose.Types.ObjectId(),
+    unique: true,
+    immutable: true
+  },
+  fullName: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Full name cannot exceed 100 characters']
+  },
+  teamId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team',
+    default: null
+  },
+  playerClass: {
+    type: String,
+    enum: playerClasses,
+    default: 'Adventurer' // Default player class
   }
 });
+
 
 // Encrypt password using bcrypt
 userSchema.pre('save', async function(next) {
@@ -42,6 +66,14 @@ userSchema.pre('save', async function(next) {
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  
+  // Enforce playerClass based on role
+  if (this.role === 'mentor' && this.playerClass !== 'Captain') {
+    this.playerClass = 'Captain';
+  } else if (this.role === 'coordinator' && this.playerClass !== 'Guild Master') {
+    this.playerClass = 'Guild Master';
+  }
+  next();
 });
 
 // Match user entered password to hashed password in database
