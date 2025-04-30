@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/authMiddleware');
+const { protect, authorize } = require('../middleware/authMiddleware'); // Import authorize
 const Team = require('../models/Team');
 const User = require('../models/User');
 
@@ -194,5 +194,124 @@ router.patch('/change-lead', protect, async (req, res) => {
       res.status(500).json({ msg: 'Server error' });
     }
   });
+
+// @route   PATCH /api/teams/add-mentor
+// @desc    Add or update the mentor for a specific team
+// @access  Private (Admin or Mentor)
+// Note: Removed :teamId from the route path
+router.patch('/add-mentor', protect, authorize('admin', 'mentor'), async (req, res) => {
+  const { teamId } = req.body; // Only teamId is strictly required from body now
+  let mentorIdToAdd;
+
+  if (!teamId) {
+    return res.status(400).json({ msg: 'Team ID is required in the request body' });
+  }
+
+  // Determine the mentorId based on the user's role
+  if (req.user.role === 'admin') {
+    const { mentorId } = req.body; // Admin must provide the mentorId
+    if (!mentorId) {
+      console.log('Admin must provide Mentor ID'); // Debug log
+      return res.status(400).json({ msg: 'Mentor ID is required in the body for admin users' });
+    }
+    mentorIdToAdd = mentorId;
+  } else if (req.user.role === 'mentor') {
+    mentorIdToAdd = req.user._id; // Mentor uses their own ID
+    console.log(`Mentor ${req.user.username} assigning themselves`); // Debug log
+  } else {
+    // This case should technically not be reached due to authorize middleware
+    return res.status(403).json({ msg: 'Forbidden' });
+  }
+
+  try {
+    // Find the team
+    const team = await Team.findById(teamId);
+    if (!team) {
+      console.log(`Team not found with ID: ${teamId}`); // Debug log
+      return res.status(404).json({ msg: 'Team not found' });
+    }
+
+    // If admin is adding, perform an extra check that the provided ID is actually a mentor
+    // The model's pre-save hook will also validate this, but checking early gives better feedback
+    if (req.user.role === 'admin') {
+        const mentorUser = await User.findById(mentorIdToAdd);
+        if (!mentorUser) {
+            console.log(`Mentor user not found with ID: ${mentorIdToAdd}`); // Debug log
+            return res.status(404).json({ msg: 'Mentor user not found' });
+        }
+        if (mentorUser.role !== 'mentor') {
+            console.log(`User ${mentorUser.username} is not a mentor`); // Debug log
+            return res.status(400).json({ msg: 'The specified user ID does not belong to a mentor' });
+        }
+    }
+
+    // Update the team's mentorId
+    team.mentorId = mentorIdToAdd;
+    await team.save(); // The pre-save hook in Team model will also validate the role
+    console.log(`Mentor ${mentorIdToAdd} added/updated for team ${teamId}`); // Debug log
+
+    res.status(200).json({ msg: 'Mentor added/updated successfully', team });
+  } catch (error) {
+    console.error('Error adding/updating mentor:', error);
+    // Handle potential CastError if IDs are invalid format
+    if (error.name === 'CastError') {
+        return res.status(400).json({ msg: 'Invalid ID format provided' });
+    }
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+// @route   PATCH /api/teams/add-coordinator
+// @desc    Add or update the coordinator for a specific team
+// @access  Private (Admin or Coordinator)
+// Note: Removed :teamId from the route path
+router.patch('/add-coordinator', protect, authorize('admin', 'coordinator'), async (req, res) => {
+  const { teamId } = req.body; // Only teamId is strictly required from body now
+  let coordinatorIdToAdd;
+
+  if (!teamId) {
+    return res.status(400).json({ msg: 'Team ID is required in the request body' });
+  }
+
+  // Determine the coordinatorId based on the user's role
+  if (req.user.role === 'admin') {
+    const { coordinatorId } = req.body; // Admin must provide the coordinatorId
+    if (!coordinatorId) {
+      console.log('Admin must provide Coordinator ID'); // Debug log
+      return res.status(400).json({ msg: 'Coordinator ID is required in the body for admin users' });
+    }
+    coordinatorIdToAdd = coordinatorId;
+  } else if (req.user.role === 'coordinator') {
+    coordinatorIdToAdd = req.user._id; // Coordinator uses their own ID
+    console.log(`Coordinator ${req.user.username} assigning themselves`); // Debug log
+  } else {
+    // This case should technically not be reached due to authorize middleware
+    return res.status(403).json({ msg: 'Forbidden' });
+  }
+
+  try {
+    const team = await Team.findById(teamId);
+    if (!team) {
+        console.log(`Team not found with ID: ${teamId}`); // Debug log
+        return res.status(404).json({ msg: 'Team not found' });
+    }
+
+    // The pre-save hook in the Team model handles validation of the coordinator's role
+    team.coordinatorId = coordinatorIdToAdd;
+    await team.save();
+
+    res.status(200).json({ msg: 'Coordinator added/updated successfully', team });
+  } catch (error) {
+    console.error('Error adding/updating coordinator:', error);
+    if (error.name === 'CastError') {
+        return res.status(400).json({ msg: 'Invalid ID format provided' });
+    }
+    // Handle potential validation errors from the model's pre-save hook
+    if (error.message.includes('coordinatorId can only be set')) {
+        return res.status(400).json({ msg: error.message });
+    }
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
 
 module.exports = router;
