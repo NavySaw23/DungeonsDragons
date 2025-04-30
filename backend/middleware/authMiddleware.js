@@ -11,49 +11,47 @@ const User = require('../models/User'); // Assuming your User model is here
 const protect = async (req, res, next) => {
   let token;
 
-  // Check for token in Authorization header (format: "Bearer <token>")
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
     try {
-      // Extract token from "Bearer <token>" string
+      // Extract token
       token = req.headers.authorization.split(' ')[1];
+      console.log('Extracted Token:', token); // Debug log
 
-      // Verify the token using the secret
+      // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log('Decoded Token:', decoded); // Debug log
 
-      // Find the user associated with the token's ID
-      // Select '-password' to exclude the password hash from the result
-      req.user = await User.findById(decoded.user.id).select('-password');
+      // Use `decoded.id` instead of `decoded.user.id`
+      req.user = await User.findById(decoded.id).select('-password');
+      console.log('Authenticated User:', req.user); // Debug log
 
       if (!req.user) {
-          // Handle case where user associated with token no longer exists
-          return res.status(401).json({ msg: 'Not authorized, user not found' });
+        console.error('User not found for token'); // Debug log
+        return res.status(401).json({ msg: 'Not authorized, user not found' });
       }
 
-      // User is authenticated, proceed to the next middleware or route handler
       next();
-
     } catch (error) {
-      console.error('Token verification failed:', error.message);
-      // Handle specific JWT errors
+      console.error('Token verification failed:', error.message); // Debug log
       if (error.name === 'JsonWebTokenError') {
-          return res.status(401).json({ msg: 'Not authorized, invalid token' });
+        return res.status(401).json({ msg: 'Not authorized, invalid token' });
       }
       if (error.name === 'TokenExpiredError') {
-          return res.status(401).json({ msg: 'Not authorized, token expired' });
+        return res.status(401).json({ msg: 'Not authorized, token expired' });
       }
-      // Generic server error for other issues
       return res.status(500).json({ msg: 'Server error during token verification' });
     }
   }
 
-  // If no token is found in the header
   if (!token) {
+    console.error('No token provided in Authorization header'); // Debug log
     res.status(401).json({ msg: 'Not authorized, no token provided' });
   }
 };
+
 
 /**
  * @desc Middleware generator for role-based authorization.
@@ -64,18 +62,20 @@ const protect = async (req, res, next) => {
 const authorize = (...roles) => {
   return (req, res, next) => {
     // Assumes 'protect' middleware has already run and attached req.user
+    console.log('User Role:', req.user?.role); // Debug log
     if (!req.user || !req.user.role) {
-        // Should not happen if 'protect' ran correctly, but good safety check
-        return res.status(401).json({ msg: 'Not authorized' });
+      // Should not happen if 'protect' ran correctly, but good safety check
+      console.error('User role not found or user not authenticated'); // Debug log
+      return res.status(401).json({ msg: 'Not authorized' });
     }
 
     if (!roles.includes(req.user.role)) {
+      console.error(`Forbidden: User role '${req.user.role}' is not authorized`); // Debug log
       return res.status(403).json({ msg: `Forbidden: User role '${req.user.role}' is not authorized to access this route` });
     }
     // User has the required role, proceed
     next();
   };
 };
-
 
 module.exports = { protect, authorize };

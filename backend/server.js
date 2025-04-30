@@ -23,6 +23,8 @@ app.use(cors());
 // --- Mount Routers ---
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
+const teamRoutes = require('./routes/teamRoutes');
+app.use('/api/teams', teamRoutes);
 
 // --- Basic Test Route ---
 app.get('/', (req, res) => {
