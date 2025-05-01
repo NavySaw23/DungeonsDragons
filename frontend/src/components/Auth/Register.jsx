@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'; // Import useEffect
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-
 import '../../css/Register.css';
-import BG_UI from '../../assets/login_bg.svg'
-import dnd_logo from '../../assets/logo_dnd.svg'
+import BG_UI from '../../assets/login_bg.svg';
+import dnd_logo from '../../assets/logo_dnd.svg';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -13,16 +12,13 @@ function Register() {
     password: '',
     confirmPassword: ''
   });
-  const [loading, setLoading] = useState(false); // Component-specific loading for the submit action
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const { username, email, password, confirmPassword } = formData;
   const navigate = useNavigate();
-  // Get auth state and register function from context
-  // Alias context loading to authLoading to avoid naming conflict
   const { register, isAuthenticated, loading: authLoading } = useAuth();
 
-  // Redirect if already logged in
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       navigate('/dashboard');
@@ -47,38 +43,37 @@ function Register() {
       await register({ username, email, password });
       navigate('/dashboard');
     } catch (err) {
-      // Display the specific error message from the backend
       setError(err.response?.data?.msg || 'Registration failed');
     } finally {
       setLoading(false);
     }
   };
 
-  // Show loading indicator while checking auth status or if already authenticated (before redirect)
   if (authLoading || (!authLoading && isAuthenticated)) {
-    return <div>Loading...</div>; // Or a spinner component
+    return <div className="register-loading">Loading...</div>;
   }
 
   return (
-    <div className="auth-container">
-      <div className="left-container">
-        <img src={BG_UI} alt="Background Illustration" className="svg-illustration" />
+    <div className="register-container">
+      <div className="register-left-container">
+        <img src={BG_UI} alt="Background Illustration" className="register-svg-illustration" />
       </div>
 
-      <div className="right-container">
-        <div className="black-box">
-          <img src={dnd_logo} alt="DND Logo" className="logo_dnd" />
-          <h2>Register</h2>
-          {error && <div className="error-message" role="alert">{error}</div>}
+      <div className="register-right-container">
+        <div className="register-black-box">
+          <img src={dnd_logo} alt="DND Logo" className="register-logo-dnd" />
+          <h1 className="register-title">Register</h1>
+          {error && <div className="register-error-message" role="alert">{error}</div>}
 
-          <form onSubmit={onSubmit}>
-            <div className="form-group">
+          <form onSubmit={onSubmit} className="register-form">
+            <div className="register-form-group">
               <input
                 type="text"
                 id="username"
                 name="username"
                 value={username}
                 onChange={onChange}
+                className="register-form-input"
                 placeholder="Username"
                 required
                 disabled={loading}
@@ -86,26 +81,28 @@ function Register() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="register-form-group">
               <input
                 type="email"
                 id="email"
                 name="email"
                 value={email}
                 onChange={onChange}
+                className="register-form-input"
                 placeholder="Email"
                 required
                 disabled={loading}
               />
             </div>
 
-            <div className="form-group">
+            <div className="register-form-group">
               <input
                 type="password"
                 id="password"
                 name="password"
                 value={password}
                 onChange={onChange}
+                className="register-form-input"
                 placeholder="Password"
                 required
                 disabled={loading}
@@ -113,13 +110,14 @@ function Register() {
               />
             </div>
 
-            <div className="form-group">
+            <div className="register-form-group">
               <input
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
                 value={confirmPassword}
                 onChange={onChange}
+                className="register-form-input"
                 placeholder="Confirm Password"
                 required
                 disabled={loading}
@@ -127,13 +125,13 @@ function Register() {
               />
             </div>
 
-            <button type="submit" disabled={loading}>
+            <button type="submit" className="register-submit-button" disabled={loading}>
               {loading ? 'Registering...' : 'Register'}
             </button>
           </form>
 
-          <p className="auth-link">
-            Already have an account? <Link to="/login">Login here</Link>
+          <p className="register-auth-link">
+            Already have an account? <Link to="/login" className="register-auth-link-text">Login here</Link>
           </p>
         </div>
       </div>

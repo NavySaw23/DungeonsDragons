@@ -1,95 +1,126 @@
-.container {
-    display: flex;
-    height: 100vh;
-    width: 100%;
-    overflow: hidden; /* Prevent any horizontal scrolling */
-}
-  
-  /* .left-container,
-  .right-container {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  } */
-
-  .left-container {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end; /* Push content to the right */
-    align-items: center;
-    padding-right: 50px; /* Additional right padding to move SVG further right */
+/* Homepage Specific Styles */
+.homepage-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
 }
 
-.right-container {
-    flex: 0.8; /* Reduce space for right container */
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding-left: 20px; /* Small left padding to shift right */
-}
-  
-  .svg-illustration {
-    width: 90%;
-    height: auto;
-    max-width: 100%;
-    transform: translateX(30px);
-  }
-  
-  .black-box {
-    background-color: black;
-    color: white;
-    padding: 60px;
-    border-radius: 16px 0 0 16px; /* Only round left corners */
-    width: 100%; /* Take full width of right container */
-    max-width: none; /* Remove max-width restriction */
-    height: 450px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    text-align: left;
-    margin-left: 0; /* Ensure no margin on left */
+.homepage-left-container {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 50px;
 }
 
-  .logo_dnd {
-    width: 140px; /* adjust size as needed */
-    align-self: center;
-    margin-bottom: 20px;
-  }
-  
-  .black-box h1 {
-    margin-bottom: 10px;
-  }
-  
-  .black-box p {
-    margin-bottom: 20px;
-  }
-  
-  .black-box button {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    background-color: white;
-    color: black;
-    cursor: pointer;
-    font-weight: bold;
+.homepage-right-container {
+  flex: 0.8;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 20px;
+}
+
+.homepage-svg-illustration {
+  width: 90%;
+  height: auto;
+  max-width: 100%;
+  transform: translateX(30px);
+}
+
+.homepage-black-box {
+  background-color: black;
+  color: white;
+  padding: 60px;
+  border-radius: 16px 0 0 16px;
+  width: 100%;
+  max-width: none;
+  height: auto; /* Changed from fixed height to auto */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: left; /* Changed from flex-start to center */
+  text-align: left; /* Changed from left to center */
+  margin-left: 0;
+  gap: 24px; /* Added consistent gap between elements */
+}
+
+.homepage-logo-dnd {
+  width: 140px;
+  margin-bottom: 0; /* Removed since we're using gap */
+}
+
+.homepage-title {
+  margin: 0; /* Reset margins */
+  font-size: 2.5rem;
+}
+
+.homepage-description {
+  margin: 0; /* Reset margins */
+  font-size: 1.2rem;
+  color: #ccc;
+  max-width: 80%; /* Prevent text from stretching too wide */
+  line-height: 1.5; /* Better readability */
+}
+
+.homepage-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: white;
+  color: black;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 0; /* Removed since we're using gap */
+  transition: background-color 0.3s ease;
+  width: auto; /* Let button size to content */
+  min-width: 180px; /* Give it a minimum width */
+}
+
+.homepage-button:hover {
+  background-color: #f0f0f0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .homepage-container {
+      flex-direction: column;
   }
 
-  .homepage-button {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    background-color: white;
-    color: black;
-    cursor: pointer;
-    font-weight: bold;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 20px;
+  .homepage-left-container,
+  .homepage-right-container {
+      flex: 1;
+      padding: 20px;
+      justify-content: center;
+  }
+
+  .homepage-black-box {
+      border-radius: 16px;
+      height: auto;
+      padding: 40px;
+      align-items: center;
+      text-align: center;
+  }
+
+  .homepage-svg-illustration {
+      width: 80%;
+      transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .homepage-title {
+      font-size: 2rem;
   }
   
-  .homepage-button:hover {
-    background-color: #f0f0f0;
+  .homepage-description {
+      font-size: 1rem;
   }
   
+  .homepage-black-box {
+      padding: 30px;
+  }
+}

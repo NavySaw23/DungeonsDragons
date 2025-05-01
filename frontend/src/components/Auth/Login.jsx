@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from 'react'; // Import useEffect
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-
-import '../../css/Login.css'
-import BG_UI from '../../assets/login_bg.svg'
-import dnd_logo from '../../assets/logo_dnd.svg'
+import '../../css/Login.css';
+import BG_UI from '../../assets/login_bg.svg';
+import dnd_logo from '../../assets/logo_dnd.svg';
 
 const Login = () => {
   const navigate = useNavigate();
-  // Get auth state and login function from context
-  // Alias context loading to authLoading to avoid naming conflict
   const { login, isAuthenticated, loading: authLoading } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -17,11 +14,10 @@ const Login = () => {
     password: ''
   });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // Component-specific loading for the submit action
+  const [loading, setLoading] = useState(false);
 
   const { email, password } = formData;
 
-  // Redirect if already logged in
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       navigate('/dashboard');
@@ -41,7 +37,6 @@ const Login = () => {
         setError('Please fill in all fields');
         return;
       }
-
       await login({ email, password });
       navigate('/dashboard');
     } catch (err) {
@@ -55,57 +50,58 @@ const Login = () => {
     }
   };
 
-  // Show loading indicator while checking auth status or if already authenticated (before redirect)
   if (authLoading || (!authLoading && isAuthenticated)) {
-    return <div>Loading...</div>; // Or a spinner component
+    return <div className="login-loading">Loading...</div>;
   }
 
   return (
-    <div className="auth-container">
-      <div className="left-container">
-        <img src={BG_UI} alt="Background Illustration" className="svg-illustration" />
+    <div className="login-container">
+      <div className="login-left-container">
+        <img src={BG_UI} alt="Background Illustration" className="login-svg-illustration" />
       </div>
 
-      <div className="right-container">
-        <div className="black-box">
-          <img src={dnd_logo} alt="DND Logo" className="logo_dnd" />
-          <h1>Login</h1>
-          {error && <div className="error-message" role="alert">{error}</div>}
+      <div className="login-right-container">
+        <div className="login-black-box">
+          <img src={dnd_logo} alt="DND Logo" className="login-logo-dnd" />
+          <h1 className="login-title">Login</h1>
+          {error && <div className="login-error-message" role="alert">{error}</div>}
 
-          <form onSubmit={onSubmit}>
-            <div className="form-group">
-              <label htmlFor="email">Email:</label>
+          <form onSubmit={onSubmit} className="login-form">
+            <div className="login-form-group">
+              <label htmlFor="email" className="login-form-label">Email:</label>
               <input
                 type="email"
                 id="email"
                 name="email"
                 value={email}
                 onChange={onChange}
+                className="login-form-input"
                 required
                 disabled={loading}
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="password">Password:</label>
+            <div className="login-form-group">
+              <label htmlFor="password" className="login-form-label">Password:</label>
               <input
                 type="password"
                 id="password"
                 name="password"
                 value={password}
                 onChange={onChange}
+                className="login-form-input"
                 required
                 disabled={loading}
               />
             </div>
 
-            <button type="submit" disabled={loading}>
+            <button type="submit" className="login-submit-button" disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
 
-          <p className="auth-link">
-            New user? <Link to="/register">Register here</Link>
+          <p className="login-auth-link">
+            New user? <Link to="/register" className="login-auth-link-text">Register here</Link>
           </p>
         </div>
       </div>

@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
 import { Link } from 'react-router-dom';
-
 import '../css/Dashboard.css';
 import Avatar from '../assets/character.svg';
 import Waves_BG from '../assets/waves-big.svg';
-// import { ReactComponent as Waves_BG } from '../assets/waves-big.svg';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -93,6 +90,11 @@ function Dashboard() {
     navigate('/login');
   };
 
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    // You can add a toast notification here if needed
+  };
+
   if (loading) {
     return <div className="loading">Loading dashboard...</div>;
   }
@@ -123,14 +125,41 @@ function Dashboard() {
           <div className="team-details-container">
             {teamData ? (
               <>
-                <h2 className="team-name">{teamData.name}</h2>
-                {teamData.mentorId && (
-                  <p className="mentor-info">
-                    <strong>Mentor:</strong> {teamData.mentorId.username || 'N/A'}
-                  </p>
-                )}
                 <div className="members-section">
-                  <h3 className="members-title">Members</h3>
+                  <div className="members-header">
+                    <h2 className="team-name">
+                      {teamData.name}
+                      <button 
+                        className="copy-icon" 
+                        onClick={() => copyToClipboard(teamData.name)}
+                        title="Copy team name"
+                      >
+                        ⎘
+                      </button>
+                    </h2>
+                    <div className="team-roles">
+                      {teamData.mentorId ? (
+                        <span className="role-badge mentor">
+                          Mentor: {teamData.mentorId.username || 'N/A'}
+                        </span>
+                      ) : (
+                        <button className="add-role-btn">
+                          + Add Mentor
+                        </button>
+                      )}
+                      
+                      {teamData.coordinatorId ? (
+                        <span className="role-badge coordinator">
+                          Coordinator: {teamData.coordinatorId.username || 'N/A'}
+                        </span>
+                      ) : (
+                        <button className="add-role-btn">
+                          + Add Coordinator
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  
                   <ul className="members-list">
                     {teamData.members && teamData.members.length > 0 ? (
                       teamData.members.map((member) => (
@@ -143,7 +172,7 @@ function Dashboard() {
                           </div>
                           <div className="member-stats">
                             <span className="member-class">
-                              {member.role || 'No class'}
+                              {member.role || 'No role'}
                             </span>
                             <div className="health-bar-container">
                               <span className="health-text">HP: 100/100</span>
@@ -204,8 +233,6 @@ function Dashboard() {
           <h2 className="feature-title">Pomodoro Timer</h2>
         </Link>
       </div>
-
-
 
       {/* Modals */}
       {showCreateModal && (
