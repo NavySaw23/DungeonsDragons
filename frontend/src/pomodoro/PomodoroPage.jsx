@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, RotateCcw, Coffee, Briefcase, Volume2, VolumeX } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import rainSoundFile from '../assets/Rain_sound.mp3';
 import nightSoundFile from '../assets/Night_sound.mp3';
 import alertSoundFile from '../assets/notification.mp3';
@@ -163,8 +164,37 @@ const PomodoroTimer = () => {
       minHeight: '100vh',
       backgroundColor: '#111827', // gray-900
       color: 'white',
-      padding: '24px'
+      padding: '24px',
+      position: 'relative'
     }}>
+      {/* Dashboard Back Button */}
+      <Link 
+        to="/dashboard" 
+        style={{
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          padding: '8px 16px',
+          backgroundColor: '#374151',
+          color: 'white',
+          borderRadius: '6px',
+          textDecoration: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          zIndex: 10,
+          border: '1px solid #4B5563',
+          transition: 'all 0.2s ease'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4B5563'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#374151'}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Dashboard
+      </Link>
+
       {/* Mode selection tabs */}
       <div style={{
         display: 'flex',
