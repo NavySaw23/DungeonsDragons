@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate for redire
 // import JoinTeamModal from './JoinTeamModal';     // Optional: Separate modal component
 import { useAuth } from '../context/AuthContext'; // Import useAuth hook
 
+import '../css/Dashboard.css'
+
 // --- API Base URL ---
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api'; // Adjust as needed
 

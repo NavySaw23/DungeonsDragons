@@ -1,0 +1,116 @@
+/* Login.css */
+.auth-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+.left-container {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 50px;
+    /* background-color: #f5f5f5; Optional: if you want a light background */
+}
+
+.right-container {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 50px;
+}
+
+.svg-illustration {
+    width: 80%;
+    height: auto;
+    max-width: 100%;
+}
+
+.black-box {
+    background-color: black;
+    color: white;
+    padding-left: 60px;
+    padding-bottom: 40px;
+    padding-top: 10px;
+    border-radius: 16px;
+    width: 80%;
+    max-width: 400px;
+    height: auto; /* Changed from fixed height to auto */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.logo_dnd {
+    width: 140px; /* adjust size as needed */
+    align-self: center;
+    margin-bottom: 20px;
+  }
+
+.black-box h1 {
+    color: white;
+    margin-bottom: 30px;
+    align-self: left;
+}
+
+.form-group {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: white;
+}
+
+.form-group input {
+    width: 175%;
+    padding: 16px;
+    border-radius: 8px;
+    border: none;
+    background-color: #333;
+    color: white;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    background-color: white;
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+button[type="submit"]:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.error-message {
+    color: #ff6b6b;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.auth-link {
+    margin-top: 20px;
+    color: white;
+    text-align: left;
+    width: 100%;
+}
+
+.auth-link a {
+    color: #4dabf7;
+    text-decoration: none;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
