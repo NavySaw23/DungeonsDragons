@@ -8,6 +8,10 @@ const taskSchema = new mongoose.Schema({
     trim: true,
     maxlength: [100, 'Task name cannot exceed 100 characters']
   },
+  description: {
+    type: String,
+    trim: true
+  },
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
