@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
+import '../../css/Login.css'
+import BG_UI from '../../assets/login_bg.svg'
+import dnd_logo from '../../assets/logo_dnd.svg'
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
@@ -43,44 +47,53 @@ const Login = () => {
 
   return (
     <div className="auth-container">
-      <h2>Login</h2>
-      {error && <div className="error-message" role="alert">{error}</div>}
+      <div className="left-container">
+        <img src={BG_UI} alt="Background Illustration" className="svg-illustration" />
+      </div>
 
-      <form onSubmit={onSubmit}>
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={email}
-            onChange={onChange}
-            required
-            disabled={loading}
-          />
+      <div className="right-container">
+        <div className="black-box">
+          <img src={dnd_logo} alt="DND Logo" className="logo_dnd" />
+          <h1>Login</h1>
+          {error && <div className="error-message" role="alert">{error}</div>}
+
+          <form onSubmit={onSubmit}>
+            <div className="form-group">
+              <label htmlFor="email">Email:</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={email}
+                onChange={onChange}
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password">Password:</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={password}
+                onChange={onChange}
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <button type="submit" disabled={loading}>
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
+          </form>
+
+          <p className="auth-link">
+            New user? <Link to="/register">Register here</Link>
+          </p>
         </div>
-
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={onChange}
-            required
-            disabled={loading}
-          />
-        </div>
-
-        <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-
-      <p className="auth-link">
-        New user? <Link to="/register">Register here</Link>
-      </p>
+      </div>
     </div>
   );
 };
