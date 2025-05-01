@@ -1,0 +1,757 @@
+/* AdminDashboard.css */
+:root {
+    --primary-bg: #f8f9fa;
+    --secondary-bg: #ffffff;
+    --accent-color: #3d5afe;
+    --accent-hover: #304ffe;
+    --text-primary: #212121;
+    --text-secondary: #616161;
+    --text-light: #9e9e9e;
+    --border-color: #e0e0e0;
+    --success-color: #00c853;
+    --error-color: #f44336;
+    --warn-color: #ffab00;
+    --danger-hover: #d32f2f;
+    --card-bg: #ffffff;
+    --header-bg: #ffffff;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+    --transition-fast: 0.2s;
+    --transition-main: 0.3s;
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --font-primary: 'Inter', 'Segoe UI', 'Roboto', -apple-system, sans-serif;
+  }
+  
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  
+  /* Base Styles */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: var(--font-primary);
+    background-color: var(--primary-bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .admin-dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  /* Typography */
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.01em;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 1.5rem 0 1rem;
+    letter-spacing: -0.01em;
+  }
+  
+  h2::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 3px;
+    background-color: var(--accent-color);
+    margin-top: 0.5rem;
+    border-radius: 3px;
+  }
+  
+  h3, h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem;
+    color: var(--text-primary);
+  }
+  
+  h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0.5rem 0;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+  }
+  
+  h5::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color: var(--accent-color);
+    margin-right: 0.5rem;
+    border-radius: 50%;
+  }
+  
+  p {
+    margin: 0.5rem 0;
+    color: var(--text-secondary);
+  }
+  
+  a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+  
+  a:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+  }
+  
+  /* Dashboard Header */
+  .dashboard-header {
+    background-color: var(--header-bg);
+    border-radius: var(--border-radius-md);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .dashboard-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-color), #651fff);
+  }
+  
+  .welcome-message {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .welcome-message p {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+  }
+  
+  .user-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--accent-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    margin-left: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .logout-button {
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+  }
+  
+  .logout-button::before {
+    content: "→";
+    display: inline-block;
+    margin-right: 0.5rem;
+    transform: rotate(180deg);
+  }
+  
+  .logout-button:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+    color: var(--error-color);
+    border-color: var(--error-color);
+  }
+  
+  /* Notifications */
+  .notification {
+    padding: 1rem 1.25rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 1.25rem;
+    animation: slideInDown 0.4s ease forwards;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    padding-left: 3rem;
+    font-weight: 500;
+  }
+  
+  .notification::before {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+  }
+  
+  .error {
+    background-color: rgba(244, 67, 54, 0.08);
+    color: var(--error-color);
+    border-left: 4px solid var(--error-color);
+  }
+  
+  .error::before {
+    content: "!";
+    color: var(--error-color);
+  }
+  
+  .success {
+    background-color: rgba(0, 200, 83, 0.08);
+    color: var(--success-color);
+    border-left: 4px solid var(--success-color);
+  }
+  
+  .success::before {
+    content: "✓";
+    color: var(--success-color);
+  }
+  
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Loading State */
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    flex-direction: column;
+  }
+  
+  .loading::after {
+    content: "";
+    width: 40px;
+    height: 40px;
+    border: 3px solid transparent;
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    margin-top: 1rem;
+    animation: spin 1s infinite ease;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Form Elements */
+  .assign-team-section {
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    border-left: 4px solid var(--accent-color);
+  }
+  
+  .assign-team-section h4 {
+    font-size: 1.1rem;
+    margin-top: 0;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+  
+  .assign-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  .assign-form label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+  
+  input[type="text"],
+  input[type="date"],
+  textarea,
+  select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    font-size: 0.9rem;
+    background-color: white;
+    transition: all var(--transition-fast);
+    color: var(--text-primary);
+    width: 100%;
+    max-width: 300px;
+    font-family: var(--font-primary);
+  }
+  
+  input[type="text"]:focus,
+  input[type="date"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(61, 90, 254, 0.1);
+  }
+  
+  button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  
+  button:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  button:active {
+    transform: translateY(0);
+  }
+  
+  button:disabled {
+    background-color: var(--text-light);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  /* Team List */
+  .team-list-section {
+    margin-top: 2.5rem;
+  }
+  
+  .team-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .team-item {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius-md);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    transition: all var(--transition-main);
+    border-top: 4px solid var(--accent-color);
+  }
+  
+  .team-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .admin-team-details h3 {
+    margin-top: 0;
+    padding-bottom: 0.5rem;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .team-id {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background-color: rgba(61, 90, 254, 0.1);
+    color: var(--accent-color);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 0;
+  }
+  
+  .remove-assignment-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: transparent;
+    color: var(--text-light);
+    border: 1px solid var(--border-color);
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 20px;
+  }
+  
+  .remove-assignment-button:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+    color: var(--error-color);
+    border-color: var(--error-color);
+    box-shadow: none;
+    transform: none;
+  }
+  
+  /* Task List */
+  .task-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0;
+  }
+  
+  .task-item {
+    padding: 1rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 0.75rem;
+    background-color: white;
+    transition: all var(--transition-fast);
+    border: 1px solid var(--border-color);
+    position: relative;
+  }
+  
+  .task-item:hover {
+    box-shadow: var(--shadow-sm);
+    border-color: rgba(61, 90, 254, 0.3);
+  }
+  
+  .task-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  .task-info {
+    margin-bottom: 0.75rem;
+  }
+  
+  .task-info p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  .task-info p strong {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .task-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+  }
+  
+  .task-actions button {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 20px;
+  }
+  
+  .remove-task-button {
+    background-color: transparent;
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+  }
+  
+  .remove-task-button:hover {
+    background-color: var(--error-color);
+    color: white;
+    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2);
+  }
+  
+  .mark-complete-button {
+    background-color: transparent;
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+  }
+  
+  .mark-complete-button:hover {
+    background-color: var(--success-color);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 200, 83, 0.2);
+  }
+  
+  /* Member List */
+  .member-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0;
+  }
+  
+  .member-list li {
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    border-bottom: 1px dashed var(--border-color);
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .member-list li:last-child {
+    border-bottom: none;
+  }
+  
+  /* Add Task Form */
+  .add-task-form {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    background-color: rgba(61, 90, 254, 0.05);
+    border-radius: var(--border-radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .add-task-form h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    color: var(--accent-color);
+  }
+  
+  .add-task-form textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+  
+  .add-task-form button {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+  }
+  
+  /* Assignee Management */
+  .assignee-management {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+  }
+  
+  .assignee-select {
+    flex: 1;
+    min-width: 180px;
+  }
+  
+  .assign-button {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 20px;
+  }
+  
+  /* Status Indicators */
+  .status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    position: relative;
+  }
+  
+  .status-indicator::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    opacity: 0.3;
+  }
+  
+  .status-todo {
+    background-color: var(--text-light);
+  }
+  
+  .status-inprogress {
+    background-color: #2196f3;
+  }
+  
+  .status-completed {
+    background-color: var(--success-color);
+  }
+  
+  .status-cancelled {
+    background-color: var(--error-color);
+  }
+  
+  /* Warning message */
+  .warning {
+    background-color: rgba(255, 171, 0, 0.1);
+    color: var(--warn-color);
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius-md);
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    border-left: 3px solid var(--warn-color);
+  }
+  
+  .warning::before {
+    content: "!";
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 20px;
+    background-color: var(--warn-color);
+    color: white;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    font-weight: bold;
+  }
+  
+  /* Card Transition Effect */
+  @keyframes cardEntrance {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .team-item {
+    animation: cardEntrance 0.5s ease forwards;
+    animation-delay: calc(var(--animation-order) * 0.1s);
+    opacity: 0;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .admin-dashboard {
+      padding: 1rem;
+    }
+  
+    .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .logout-button {
+      align-self: flex-start;
+    }
+  
+    .team-list {
+      grid-template-columns: 1fr;
+    }
+  
+    .assign-form {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  
+    input[type="text"],
+    input[type="date"],
+    textarea,
+    select {
+      max-width: none;
+    }
+  
+    .task-actions {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .task-actions button {
+      width: 100%;
+    }
+  }
+  
+  /* Element hover effects */
+  input[type="text"]:hover,
+  input[type="date"]:hover,
+  textarea:hover,
+  select:hover {
+    border-color: #b0bec5;
+  }
+  
+  /* Empty state styling */
+  .team-list-section p:not(.warning):not(.task-info p) {
+    padding: 2rem;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: var(--border-radius-md);
+    text-align: center;
+    color: var(--text-light);
+  }
+  
+  /* Task difficulty indicators */
+  .task-item[data-difficulty="easy"]::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 10px;
+    height: 100%;
+    background-color: #4caf50;
+    opacity: 0.5;
+    border-top-right-radius: var(--border-radius-md);
+    border-bottom-right-radius: var(--border-radius-md);
+  }
+  
+  .task-item[data-difficulty="medium"]::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 10px;
+    height: 100%;
+    background-color: #ff9800;
+    opacity: 0.5;
+    border-top-right-radius: var(--border-radius-md);
+    border-bottom-right-radius: var(--border-radius-md);
+  }
+  
+  .task-item[data-difficulty="hard"]::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 10px;
+    height: 100%;
+    background-color: #f44336;
+    opacity: 0.5;
+    border-top-right-radius: var(--border-radius-md);
+    border-bottom-right-radius: var(--border-radius-md);
+  }
