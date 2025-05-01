@@ -33,8 +33,9 @@ app.use('/api/auth', authRoutes);
 const teamRoutes = require('./routes/teamRoutes');
 app.use('/api/team', teamRoutes); // Changed base path to singular '/api/team' to match route comments
 
-// const projectRoutes = require('./routes/projectRoutes'); // Adjust path if needed
-// app.use('/api/projects', projectRoutes);
+const projectRoutes = require('./routes/projectRoutes'); // Adjust path if needed
+app.use('/api', projectRoutes);
+
 
 // --- Basic Test Route ---
 app.get('/', (req, res) => {

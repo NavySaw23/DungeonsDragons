@@ -20,13 +20,8 @@ const taskSchema = new mongoose.Schema({
   assignees: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    validate: {
-      validator: function(v) {
-        return v.length <= 4;
-      },
-      message: 'A task can have a maximum of 4 assignees.'
-    }
-  }],
+    // Removed validator from individual element
+  }], // Validation moved outside the array definition
   difficulty: {
     type: String,
     enum: ['easy', 'medium', 'hard'],
@@ -41,8 +36,8 @@ const taskSchema = new mongoose.Schema({
   },
   completionStatus: {
     type: String,
-    enum: ['completed', 'incomplete'],
-    default: 'incomplete'
+    enum: ['completed', 'in-progress', 'not-started','cancelled', 'overdue', 'waiting-for-grading'], 
+    default: 'not-started'
   },
   createdAt: {
     type: Date,
@@ -53,6 +48,29 @@ const taskSchema = new mongoose.Schema({
     default: Date.now
   }
 }, { timestamps: true });
+
+// Add validation for the assignees array length at the schema level
+taskSchema.path('assignees').validate(function(value) {
+  // 'value' here refers to the entire assignees array
+  return value.length <= 4;
+}, 'A task can have a maximum of 4 assignees.');
+
+
+
+// Virtual field to determine the effective status, considering the deadline
+taskSchema.virtual('effectiveStatus').get(function() {
+  const now = new Date();
+  // If already completed or cancelled, return that status
+  if (this.completionStatus === 'completed' || this.completionStatus === 'cancelled') {
+    return this.completionStatus;
+  }
+  // If not completed/cancelled, deadline exists, and deadline has passed
+  if (this.deadline && this.deadline < now && (this.completionStatus === 'in-progress' || this.completionStatus === 'not-started')) {
+    return 'overdue'; // Effectively overdue
+  }
+  // Otherwise, return the stored status
+  return this.completionStatus;
+});
 
 // Middleware to populate assignees and projectId when querying
 taskSchema.pre(/^find/, function(next) {

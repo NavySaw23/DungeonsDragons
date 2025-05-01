@@ -299,7 +299,7 @@ router.patch('/add-coordinator', protect, authorize('admin', 'coordinator'), asy
 
   // Determine the coordinatorId based on the user's role
   if (req.user.role === 'admin') {
-    const { coordinatorId } = req.body; // Admin must provide the coordinatorId
+    const { coordinatorId } = req.body; // Admin must provgive he coordinatorId
     if (!coordinatorId) {
       console.log('Admin must provide Coordinator ID'); // Debug log
       return res.status(400).json({ msg: 'Coordinator ID is required in the body for admin users' });
@@ -412,15 +412,17 @@ router.post('/add-project', protect, async (req, res) => { // Removed authorize 
 });
 
 // @route   DELETE /api/team/remove-project
-// @desc    Remove the project assignment from a specific team
+// @desc    Remove a specific project assignment from a specific team
 // @access  Private (Admin or Mentor)
-router.patch('/remove-project', protect, authorize('admin', 'mentor'), async (req, res) => {
-  const { teamId } = req.body;
-  console.log(`[PATCH /remove-project] Request received from user: ${req.user._id} (${req.user.role}), Body:`, req.body); // Debug log
+router.delete('/remove-project', protect, authorize('admin', 'mentor'), async (req, res) => {
+  const { teamId, projectId } = req.body;
+  console.log(`[DELETE /remove-project] Request received from user: ${req.user._id} (${req.user.role}), Body:`, req.body); // Debug log
 
   if (!teamId) {
-    console.log('Team ID missing'); // Debug log
     return res.status(400).json({ msg: 'Team ID is required' });
+  }
+  if (!projectId) {
+    return res.status(400).json({ msg: 'Project ID is required' });
   }
 
   try {
@@ -432,33 +434,36 @@ router.patch('/remove-project', protect, authorize('admin', 'mentor'), async (re
       return res.status(404).json({ msg: 'Team not found' });
     }
 
-    console.log(`[PATCH /remove-project] Checking if team ${teamId} has a project assigned. Current projectId: ${team.projectId}`); // Debug log
-    if (!team.projectId) {
-      console.log(`Team ${teamId} does not have any project assigned`); // Debug log
-      return res.status(400).json({ msg: 'Team does not have a project assigned' });
+    // Find the project to ensure it exists and potentially unlink it
+    const project = await Project.findById(projectId);
+    console.log(`[DELETE /remove-project] Found associated project:`, project ? project._id : 'Not Found'); // Debug log
+
+    if (!project) {
+        console.log(`Project not found with ID: ${projectId}`); // Debug log
+        return res.status(404).json({ msg: 'Project not found' });
     }
 
-    const projectId = team.projectId;
-    // Find the project without triggering its pre-find populate hook if we are just deleting/unlinking
-    // However, for consistency and potential logging, finding it might be okay.
-    // If you also want to DELETE the project itself when unlinking, do that here.
-    const project = await Project.findById(projectId); // Find the associated project
-    console.log(`[PATCH /remove-project] Found associated project:`, project ? project._id : 'Not Found'); // Debug log
+    // Verify the project is actually assigned to this team before removing
+    console.log(`[DELETE /remove-project] Verifying assignment. Team's projectId: ${team.projectId}, Provided projectId: ${projectId}`); // Debug log
+    if (!team.projectId) {
+        console.log(`Team ${teamId} does not have any project assigned.`); // Debug log
+        return res.status(400).json({ msg: 'This team does not have any project assigned.' });
+    }
+    if (!team.projectId.equals(project._id)) {
+        console.log(`Project ${projectId} is not assigned to team ${teamId}. Current assignment: ${team.projectId}`); // Debug log
+        return res.status(400).json({ msg: 'The specified project is not assigned to the specified team.' });
+    }
 
-    console.log(`[PATCH /remove-project] Unlinking project ${projectId} from team ${teamId}`); // Debug log
+    console.log(`[DELETE /remove-project] Unlinking project ${projectId} from team ${teamId}`); // Debug log
     // Remove assignments
     team.projectId = null;
-    if (project) { // Only update project if it exists
-        console.log(`[PATCH /remove-project] Setting teamId to null on project ${projectId}`); // Debug log
-        project.teamId = null; // Unlink the project from the team
-        await project.save();
-        console.log(`[PATCH /remove-project] Project ${projectId} updated.`); // Debug log
-    }
+    project.teamId = null; // Unlink the project from the team
 
+    await project.save(); // Save the project first
     await team.save();
-    console.log(`[PATCH /remove-project] Team ${teamId} updated (projectId set to null).`); // Debug log
+    console.log(`[DELETE /remove-project] Project ${projectId} and Team ${teamId} updated (unlinked).`); // Debug log
 
-    console.log(`[PATCH /remove-project] Successfully removed project assignment. Sending response.`); // Debug log
+    console.log(`[DELETE /remove-project] Successfully removed project assignment. Sending response.`); // Debug log
     res.status(200).json({ msg: 'Project removed successfully', team });
 
   } catch (error) {
@@ -466,7 +471,7 @@ router.patch('/remove-project', protect, authorize('admin', 'mentor'), async (re
     if (error.name === 'CastError') {
         return res.status(400).json({ msg: 'Invalid Team ID format provided' });
     }
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: 'Server error while removing project' });
   }
 });
 
