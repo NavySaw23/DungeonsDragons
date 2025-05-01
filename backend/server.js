@@ -9,6 +9,12 @@ dotenv.config();
 // Connect to Database
 connectDB();
 
+// --- Load Models (Register Schemas with Mongoose) ---
+require('./models/User');
+require('./models/Team');
+require('./models/Project');
+require('./models/Task');
+
 // Initialize Express app
 const app = express();
 
@@ -23,8 +29,13 @@ app.use(cors());
 // --- Mount Routers ---
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
+
 const teamRoutes = require('./routes/teamRoutes');
-app.use('/api/teams', teamRoutes);
+app.use('/api/team', teamRoutes); // Changed base path to singular '/api/team' to match route comments
+
+const projectRoutes = require('./routes/projectRoutes'); // Adjust path if needed
+app.use('/api', projectRoutes);
+
 
 // --- Basic Test Route ---
 app.get('/', (req, res) => {

@@ -1,12 +1,6 @@
 const mongoose = require('mongoose');
 
 const teamSchema = new mongoose.Schema({
-  teamId: {
-    type: mongoose.Schema.Types.ObjectId,
-    default: () => new mongoose.Types.ObjectId(),
-    unique: true,
-    immutable: true
-  },
   name: {
     type: String,
     required: [true, 'Please provide a team name'],
@@ -32,10 +26,6 @@ const teamSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  teammateId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
   coordinatorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
@@ -50,7 +40,7 @@ const teamSchema = new mongoose.Schema({
   }
 });
 
-// Middleware to populate members and teamLead when querying
+// Middleware to populate fields when querying (Consider removing/refining for performance)
 teamSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'members',
@@ -60,9 +50,6 @@ teamSchema.pre(/^find/, function(next) {
     select: 'userId username email role' // Removed fullName to match original
   }).populate({
     path: 'mentorId',
-    select: 'userId username email role' // Removed fullName to match original
-  }).populate({
-    path: 'teammateId',
     select: 'userId username email role' // Removed fullName to match original
   }).populate({
     path: 'coordinatorId',
@@ -77,17 +64,6 @@ teamSchema.pre('save', async function(next) {
     const mentorUser = await mongoose.model('User').findById(this.mentorId);
     if (!mentorUser || mentorUser.role !== 'mentor') {
       return next(new Error('mentorId can only be set to a user with the "mentor" role.'));
-    }
-  }
-  next();
-});
-
-// Middleware to ensure teammateId is set only for users with 'student' role
-teamSchema.pre('save', async function(next) {
-  if (this.teammateId) {
-    const studentUser = await mongoose.model('User').findById(this.teammateId);
-    if (!studentUser || studentUser.role !== 'student') {
-      return next(new Error('teammateId can only be set to a user with the "student" role.'));
     }
   }
   next();

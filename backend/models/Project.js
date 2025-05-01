@@ -23,16 +23,6 @@ const projectSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Team'
   },
-  startDate: {
-    type: Date,
-    required: [true, 'Please provide a start date']
-  },
-  endDate: {
-    type: Date
-  },
-  textDescription: {
-    type: String
-  },
   tasks: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Task'

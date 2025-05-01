@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Import useEffect
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -13,12 +13,21 @@ function Register() {
     password: '',
     confirmPassword: ''
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Component-specific loading for the submit action
   const [error, setError] = useState('');
 
   const { username, email, password, confirmPassword } = formData;
   const navigate = useNavigate();
-  const { register } = useAuth();
+  // Get auth state and register function from context
+  // Alias context loading to authLoading to avoid naming conflict
+  const { register, isAuthenticated, loading: authLoading } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [authLoading, isAuthenticated, navigate]);
 
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -44,6 +53,11 @@ function Register() {
       setLoading(false);
     }
   };
+
+  // Show loading indicator while checking auth status or if already authenticated (before redirect)
+  if (authLoading || (!authLoading && isAuthenticated)) {
+    return <div>Loading...</div>; // Or a spinner component
+  }
 
   return (
     <div className="auth-container">

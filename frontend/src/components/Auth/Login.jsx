@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Import useEffect
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -7,16 +7,26 @@ import BG_UI from '../../assets/login_bg.svg'
 import dnd_logo from '../../assets/logo_dnd.svg'
 
 const Login = () => {
+  const navigate = useNavigate();
+  // Get auth state and login function from context
+  // Alias context loading to authLoading to avoid naming conflict
+  const { login, isAuthenticated, loading: authLoading } = useAuth();
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Component-specific loading for the submit action
 
   const { email, password } = formData;
-  const navigate = useNavigate();
-  const { login } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [authLoading, isAuthenticated, navigate]);
 
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -44,6 +54,11 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  // Show loading indicator while checking auth status or if already authenticated (before redirect)
+  if (authLoading || (!authLoading && isAuthenticated)) {
+    return <div>Loading...</div>; // Or a spinner component
+  }
 
   return (
     <div className="auth-container">
