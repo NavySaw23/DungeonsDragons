@@ -12,7 +12,7 @@ const Project = require('../models/Project'); // Import Project model
 router.get('/me', protect, async (req, res) => {
   try {
     const team = await Team.findOne({ members: req.user._id })
-      .populate('members', 'username email role playerClass _id') // Added playerClass and _id (good practice)
+      .populate('members', 'username email role playerClass') // Added playerClass
       .populate('projectId', 'name description'); // Populate project details
 
     if (!team) {

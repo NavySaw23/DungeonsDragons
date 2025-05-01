@@ -10,6 +10,37 @@ import Waves_BG from '../assets/waves-big.svg';
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 function Dashboard() {
+  // --- Suggestion: Extract Member List Item Component ---
+  const MemberListItem = ({ member, teamLeadId }) => {
+    const maxHealth = member.maxHealth || 100; // Default max health if not provided
+    const currentHealth = member.health !== undefined ? member.health : maxHealth; // Default to full if undefined
+    const healthPercentage = maxHealth > 0 ? (currentHealth / maxHealth) * 100 : 100;
+
+    return (
+      <li key={member._id} className="member-item">
+        <div className="member-info">
+          <span className="member-name">{member.username}</span>
+          {teamLeadId === member._id && (
+            <span className="team-lead">(Lead)</span>
+          )}
+        </div>
+        <div className="member-stats">
+          <span className="member-class">
+            {/* Ensure 'playerClass' field exists and is populated in the API response */}
+            {member.playerClass || 'Adventurer'}
+          </span>
+          <div className="health-bar-container">
+            <span className="health-text">HP: {currentHealth}/{maxHealth}</span>
+            <div className="health-bar">
+              <div className="health-fill" style={{ width: `${healthPercentage}%` }}></div>
+            </div>
+          </div>
+        </div>
+      </li>
+    );
+  };
+  // --- End Suggestion ---
+
   const [teamData, setTeamData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -26,6 +57,8 @@ function Dashboard() {
   const [projectDescription, setProjectDescription] = useState(''); // State for project description input
   const [actionSuccess, setActionSuccess] = useState('');
   const [showAddRoleModal, setShowAddRoleModal] = useState(false); // State for Add Role modal
+  const [copiedTimeoutId, setCopiedTimeoutId] = useState(null); // For copy feedback timeout
+  const [copiedStatus, setCopiedStatus] = useState({}); // To track which button shows "Copied!"
 
   const fetchTeamData = async () => {
     setLoading(true);
@@ -143,21 +176,30 @@ function Dashboard() {
     navigate('/login');
   };
 
-  const copyToClipboard = (text) => {
+  const copyToClipboard = (text, id) => {
+    // Clear previous timeout if exists
+    if (copiedTimeoutId) {
+      clearTimeout(copiedTimeoutId);
+    }
+    // Reset all statuses before setting the new one
+    setCopiedStatus({});
+
     if (!navigator.clipboard) {
-      // Clipboard API not available (likely due to insecure context)
       console.error('Clipboard API not available. Ensure you are on HTTPS or localhost.');
-      // Optionally, display an error message to the user
-      // alert('Could not copy text: Clipboard API not available in this context.');
+      setCopiedStatus({ [id]: 'Error!' }); // Show error feedback
       return;
     }
     navigator.clipboard.writeText(text).then(() => {
-      // Optional: Add a success message/toast notification here
-      // console.log('Text copied to clipboard!');
+      setCopiedStatus({ [id]: 'Copied!' }); // Set success feedback for this specific button
+      // Set a timeout to clear the "Copied!" message after 2 seconds
+      const timeoutId = setTimeout(() => {
+        setCopiedStatus({});
+        setCopiedTimeoutId(null);
+      }, 2000);
+      setCopiedTimeoutId(timeoutId);
     }).catch(err => {
+      setCopiedStatus({ [id]: 'Failed!' }); // Show failure feedback
       console.error('Failed to copy text: ', err);
-      // Optionally, display an error message to the user
-      // alert('Failed to copy text.');
     });
   };
 
@@ -203,20 +245,20 @@ function Dashboard() {
                       {teamData.name}
                       <button 
                         className="copy-icon" 
-                        onClick={() => copyToClipboard(teamData.name)}
+                        onClick={() => copyToClipboard(teamData.name, 'teamName')}
                         title="Copy team name"
                       >
-                        ⎘
+                        {copiedStatus['teamName'] || '⎘'}
                       </button>
                     </h2>
                     {/* Project Display/Add Button */}
-                    {teamData.projectId ? (
-                      <p className="project-name" title={teamData.projectId.description || 'No description'}>
+                    {teamData.projectId ? ( // Check if projectId exists
+                      <p className="project-name" title={teamData.projectId?.description || 'No description'}>
                         Project: {teamData.projectId.name}
                       </p>
                     ) : (
                       <button
-                        className="add-role-btn" // Changed class to match Add Mentor/Coordinator
+                        className="add-project-btn" // Use a more specific class name
                         onClick={() => { setShowAddProjectModal(true); setActionError(''); setActionSuccess(''); }}
                       >
                         + Add Project
@@ -225,9 +267,9 @@ function Dashboard() {
                     {/* End Project Display/Add Button */}
 
                     <div className="team-roles">
-                      {teamData.mentorId ? (
+                      {teamData.mentorId ? ( // Check if mentorId exists
                         <span className="role-badge mentor">
-                          Mentor: {teamData.mentorId.username || 'N/A'}
+                          Mentor: {teamData.mentorId?.username || 'N/A'} {/* Safer access */}
                         </span>
                       ) : (
                         <button
@@ -238,9 +280,9 @@ function Dashboard() {
                         </button>
                       )}
                       
-                      {teamData.coordinatorId ? (
+                      {teamData.coordinatorId ? ( // Check if coordinatorId exists
                         <span className="role-badge coordinator">
-                          Coordinator: {teamData.coordinatorId.username || 'N/A'}
+                          Coordinator: {teamData.coordinatorId?.username || 'N/A'} {/* Safer access */}
                         </span>
                       ) : (
                         <button
@@ -256,28 +298,12 @@ function Dashboard() {
                   <ul className="members-list">
                     {teamData.members && teamData.members.length > 0 ? (
                       teamData.members.map((member) => (
-                        <li key={member._id} className="member-item">
-                          <div className="member-info">
-                            <span className="member-name">{member.username}</span>
-                            {teamData.teamLeadId === member._id && (
-                              <span className="team-lead">(Lead)</span>
-                            )}
-                          </div>
-                          <div className="member-stats">
-                            <span className="member-class">
-                              {member.playerClass || 'No class'} {/* Changed from role to playerClass */}
-                            </span>
-                            <div className="health-bar-container">
-                              <span className="health-text">HP: 100/100</span>
-                              <div className="health-bar">
-                                <div 
-                                  className="health-fill" 
-                                  style={{ width: '100%' }}
-                                ></div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
+                        // Use the extracted component
+                        <MemberListItem
+                          key={member._id} // Keep key here on the component instance in the map
+                          member={member}
+                          teamLeadId={teamData.teamLeadId}
+                        /> // Use self-closing tag for the component
                       ))
                     ) : (
                       <li className="member-item">No members found</li>
@@ -346,7 +372,11 @@ function Dashboard() {
                 <button 
                   type="button" 
                   className="modal-cancel"
-                  onClick={() => setShowCreateModal(false)}
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setActionError(''); // Clear errors/success on cancel
+                    setActionSuccess('');
+                  }}
                 >
                   Cancel
                 </button>
@@ -376,7 +406,11 @@ function Dashboard() {
                 <button 
                   type="button" 
                   className="modal-cancel"
-                  onClick={() => setShowJoinModal(false)}
+                  onClick={() => {
+                    setShowJoinModal(false);
+                    setActionError(''); // Clear errors/success on cancel
+                    setActionSuccess('');
+                  }}
                 >
                   Cancel
                 </button>
@@ -413,7 +447,11 @@ function Dashboard() {
                 <button
                   type="button"
                   className="modal-cancel"
-                  onClick={() => { setShowAddProjectModal(false); setActionError(''); setActionSuccess(''); }} // Close and clear errors
+                  onClick={() => {
+                    setShowAddProjectModal(false);
+                    setActionError(''); // Already clearing here, which is good
+                    setActionSuccess('');
+                  }}
                 >
                   Cancel
                 </button>
@@ -437,10 +475,10 @@ function Dashboard() {
               <span className="team-id-text">{teamData._id}</span>
               <button
                 className="copy-id-btn"
-                onClick={() => copyToClipboard(teamData._id)}
+                onClick={() => copyToClipboard(teamData._id, 'teamId')}
                 title="Copy Team ID"
               >
-                Copy ID 📋
+                {copiedStatus['teamId'] || 'Copy ID 📋'}
               </button>
             </div>
             <div className="modal-buttons">

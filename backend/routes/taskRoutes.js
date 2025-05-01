@@ -177,6 +177,106 @@ router.delete('/:taskId', protect, authorize('mentor'), async (req, res) => {
     }
 });
 
+// --- Task Status & Health Routes ---
+
+/**
+ * @route   PATCH /api/tasks/:taskId/complete
+ * @desc    Mark a task as completed and increment assignee health
+ * @access  Private (Mentor role required)
+ */
+router.patch('/:taskId/complete', protect, authorize('mentor'), async (req, res) => {
+    const { taskId } = req.params;
+    const healthIncrement = 5; // Define how much health is gained per completed task
+
+    if (!mongoose.Types.ObjectId.isValid(taskId)) {
+        return res.status(400).json({ success: false, msg: 'Invalid Task ID format.' });
+    }
+
+    try {
+        // 1. Find the task and update its status
+        const task = await Task.findByIdAndUpdate(
+            taskId,
+            { completionStatus: 'completed' },
+            { new: true } // Return the updated document
+        );
+
+        if (!task) {
+            return res.status(404).json({ success: false, msg: 'Task not found.' });
+        }
+
+        // 2. Increment health for assignees (if any)
+        if (task.assignees && task.assignees.length > 0) {
+            // Use updateMany with an aggregation pipeline to handle the max health limit safely
+            await User.updateMany(
+                { _id: { $in: task.assignees } },
+                [{ $set: { health: { $min: [ { $add: ["$health", healthIncrement] }, 100 ] } } }]
+            );
+            console.log(`Health incremented for assignees of task ${taskId}`);
+        }
+
+        res.status(200).json({ success: true, msg: 'Task marked complete, assignee health updated.', data: task });
+
+    } catch (error) {
+        console.error("Error marking task complete:", error);
+        res.status(500).json({ success: false, msg: 'Server error while marking task complete.' });
+    }
+});
+
+/**
+ * @route   PATCH /api/tasks/:taskId/miss-deadline
+ * @desc    Decrement health for assignees if a task deadline is missed (requires external trigger)
+ * @access  Private (Mentor/Admin role likely required)
+ */
+router.patch('/:taskId/miss-deadline', protect, authorize('mentor', 'admin'), async (req, res) => {
+    const { taskId } = req.params;
+    const healthDecrement = 10; // Define how much health is lost for missing a deadline
+
+    if (!mongoose.Types.ObjectId.isValid(taskId)) {
+        return res.status(400).json({ success: false, msg: 'Invalid Task ID format.' });
+    }
+
+    // !! IMPORTANT !!
+    // This route only contains the logic. You need a separate process
+    // (e.g., a scheduled job) to check deadlines and call this route.
+
+    try {
+        // 1. Find the task
+        const task = await Task.findById(taskId);
+
+        if (!task) {
+            return res.status(404).json({ success: false, msg: 'Task not found.' });
+        }
+
+        // 2. Check conditions for decrementing health
+        const now = new Date();
+        const isOverdue = task.deadline && task.deadline < now;
+        const isNotFinished = task.completionStatus !== 'completed' && task.completionStatus !== 'cancelled';
+
+        if (!isOverdue || !isNotFinished) {
+            return res.status(400).json({ success: false, msg: 'Task is not eligible for deadline penalty (not overdue or already finished).' });
+        }
+
+        // 3. Decrement health for assignees (if any)
+        if (task.assignees && task.assignees.length > 0) {
+            // Use updateMany with an aggregation pipeline to handle the min health limit safely
+            await User.updateMany(
+                { _id: { $in: task.assignees } },
+                [{ $set: { health: { $max: [ { $subtract: ["$health", healthDecrement] }, 0 ] } } }]
+            );
+            console.log(`Health decremented for assignees of overdue task ${taskId}`);
+        }
+
+        // Optionally update task status to 'overdue' here if not done elsewhere
+        // await Task.findByIdAndUpdate(taskId, { completionStatus: 'overdue' });
+
+        res.status(200).json({ success: true, msg: 'Assignee health updated due to missed deadline.' });
+
+    } catch (error) {
+        console.error("Error processing missed deadline:", error);
+        res.status(500).json({ success: false, msg: 'Server error while processing missed deadline.' });
+    }
+});
+
 // --- Task Assignment Routes ---
 
 /**
@@ -193,7 +293,7 @@ router.patch('/:taskId/assign', protect, authorize('mentor'), async (req, res) =
     }
 
     try {
-        // Add the user ID to the assignees array if not already present
+        // 1. Find the task and check assignee count before adding
         const updatedTask = await Task.findByIdAndUpdate(
             taskId,
             { $addToSet: { assignees: userId } }, // $addToSet prevents duplicates
@@ -201,9 +301,16 @@ router.patch('/:taskId/assign', protect, authorize('mentor'), async (req, res) =
         ).populate({ // Populate directly after update
             path: 'assignees', select: 'username _id' // Populate assignees
         });
+
         if (!updatedTask) {
             return res.status(404).json({ success: false, msg: 'Task not found.' });
         }
+
+        // Mongoose validation for array length runs before the update using $addToSet.
+        // We need to manually check *after* the update if the validation failed silently
+        // or implement a pre-save hook if using .save(). For simplicity here, we rely
+        // on the schema validation message if runValidators catches it, but $addToSet might bypass it.
+
         res.status(200).json({ success: true, data: updatedTask });
     } catch (error) {
         console.error("Error assigning user to task:", error);

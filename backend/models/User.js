@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const playerClasses = ['Adventurer', 'Warrior', 'Mage', 'Thief', 'Healer', 'Captain', 'Guild Master'];
-
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -53,8 +51,15 @@ const userSchema = new mongoose.Schema({
   },
   playerClass: {
     type: String,
-    enum: playerClasses,
+    enum: ['Adventurer', 'Warrior', 'Mage', 'Thief', 'Healer', 'Captain', 'Guild Master'],
     default: 'Adventurer' // Default player class
+  },
+  health: {
+    type: Number,
+    default: 100,
+    min: [0, 'Health cannot be less than 0'],
+    max: [100, 'Health cannot exceed 100']
+    // Note: min/max validators primarily work on .save() or .validate(). Updates need careful handling.
   }
 });
 

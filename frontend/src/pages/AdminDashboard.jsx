@@ -20,6 +20,8 @@ function AdminDashboard() {
   const [newTaskDifficulty, setNewTaskDifficulty] = useState('medium');
   const [newTaskDeadline, setNewTaskDeadline] = useState('');
   const [assigneeToAdd, setAssigneeToAdd] = useState(''); // State for selected assignee ID
+  const [mentorTeamIdInput, setMentorTeamIdInput] = useState(''); // State for mentor team ID input
+  const [coordinatorTeamIdInput, setCoordinatorTeamIdInput] = useState(''); // State for coordinator team ID input
   const { user, logout } = useAuth(); // Get user info and logout function
   const navigate = useNavigate();
 
@@ -77,7 +79,7 @@ function AdminDashboard() {
 
   // --- Action Handlers ---
 
-  const handleTeamAssignment = async (role, teamId) => {
+  const handleTeamAssignment = async (role, teamId, clearInputCallback) => {
     if (!teamId) {
       setActionError(`Please enter a Team ID to assign.`);
       return;
@@ -90,6 +92,7 @@ function AdminDashboard() {
     try {
       await axios.patch(`${API_URL}${endpoint}`, { teamId });
       setActionSuccess(`Successfully assigned yourself to team ${teamId}. Refreshing list...`);
+      clearInputCallback(); // Clear the input field on success
       // Refetch teams after successful assignment
       await fetchAdminTeams(); // Call the fetch function directly
     } catch (err) {
@@ -333,11 +336,11 @@ function AdminDashboard() {
               <h4>Members: ({team.members?.length || 0}/{team.maxSize})</h4>
               <ul className="member-list">
                 {team.teamLeadId && ( // Display Lead separately or as part of members
-                  <li>Lead: {team.teamLeadId.username} (ID: {team.teamLeadId._id}) - Health: {team.teamLeadId.health ?? 'N/A'}%</li>
+                  <li>Lead: {team.teamLeadId.username} (ID: {team.teamLeadId._id})</li>
                 )}
                 {team.members?.filter(member => member._id !== team.teamLeadId?._id) // Filter out the lead from the members list
                                .map(member => (
-                  <li key={member._id}>{member.username} (ID: {member._id}) - Health: {member.health ?? 'N/A'}%</li>
+                  <li key={member._id}>{member.username} (ID: {member._id})</li>
                 ))}
               </ul>
             </li>
@@ -363,15 +366,29 @@ function AdminDashboard() {
         {user?.role === 'mentor' && (
           <div className="assign-form">
             <label htmlFor="mentorTeamId">Team ID:</label>
-            <input type="text" id="mentorTeamId" name="mentorTeamId" placeholder="Enter Team ID to Mentor" />
-            <button onClick={() => handleTeamAssignment('mentor', document.getElementById('mentorTeamId').value)}>Assign as Mentor</button>
+            <input
+              type="text"
+              id="mentorTeamId"
+              name="mentorTeamId"
+              placeholder="Enter Team ID to Mentor"
+              value={mentorTeamIdInput}
+              onChange={(e) => setMentorTeamIdInput(e.target.value)}
+            />
+            <button onClick={() => handleTeamAssignment('mentor', mentorTeamIdInput, () => setMentorTeamIdInput(''))}>Assign as Mentor</button>
           </div>
         )}
         {user?.role === 'coordinator' && (
           <div className="assign-form">
             <label htmlFor="coordinatorTeamId">Team ID:</label>
-            <input type="text" id="coordinatorTeamId" name="coordinatorTeamId" placeholder="Enter Team ID to Coordinate" />
-            <button onClick={() => handleTeamAssignment('coordinator', document.getElementById('coordinatorTeamId').value)}>Assign as Coordinator</button>
+            <input
+              type="text"
+              id="coordinatorTeamId"
+              name="coordinatorTeamId"
+              placeholder="Enter Team ID to Coordinate"
+              value={coordinatorTeamIdInput}
+              onChange={(e) => setCoordinatorTeamIdInput(e.target.value)}
+            />
+            <button onClick={() => handleTeamAssignment('coordinator', coordinatorTeamIdInput, () => setCoordinatorTeamIdInput(''))}>Assign as Coordinator</button>
           </div>
         )}
       </div>
