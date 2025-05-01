@@ -32,7 +32,8 @@ const taskSchema = new mongoose.Schema({
   },
   submissionLink: {
     type: String,
-    trim: true
+    trim: true,
+    default: null,
   },
   completionStatus: {
     type: String,
@@ -73,15 +74,15 @@ taskSchema.virtual('effectiveStatus').get(function() {
 });
 
 // Middleware to populate assignees and projectId when querying
-taskSchema.pre(/^find/, function(next) {
-  this.populate({
-    path: 'assignees',
-    select: 'userId fullName username email role'
-  }).populate({
-    path: 'projectId',
-    select: 'name description' // Include relevant project fields
-  });
-  next();
-});
+// taskSchema.pre(/^find/, function(next) {
+//   this.populate({
+//     path: 'assignees',
+//     select: 'userId fullName username email role'
+//   }).populate({
+//     path: 'projectId',
+//     select: 'name description' // Include relevant project fields
+//   });
+//   next();
+// });
 
 module.exports = mongoose.model('Task', taskSchema);

@@ -7,6 +7,7 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import PomodoroPage from './pomodoro/PomodoroPage';
 import CalendarWidget from './calendar/calendar';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/pomodoropage" element={<PomodoroPage />} />
         <Route path="/calendar" element={<CalendarWidget />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </Router>
   );

@@ -34,21 +34,21 @@ const projectSchema = new mongoose.Schema({
 });
 
 // Middleware to populate mentorId, coordinatorId, teamId, and tasks when querying
-projectSchema.pre(/^find/, function(next) {
-  this.populate({
-    path: 'mentorId',
-    select: 'userId fullName username email role'
-  }).populate({
-    path: 'coordinatorId',
-    select: 'userId fullName username email role'
-  }).populate({
-    path: 'teamId',
-    select: 'teamId name'
-  }).populate({
-    path: 'tasks',
-    select: 'taskId title status' // Adjust fields as needed
-  });
-  next();
-});
+// projectSchema.pre(/^find/, function(next) {
+//   this.populate({
+//     path: 'mentorId',
+//     select: 'userId fullName username email role'
+//   }).populate({
+//     path: 'coordinatorId',
+//     select: 'userId fullName username email role'
+//   }).populate({
+//     path: 'teamId',
+//     select: 'teamId name'
+//   }).populate({
+//     path: 'tasks',
+//     select: 'taskId title status' // Adjust fields as needed
+//   });
+//   next();
+// });
 
 module.exports = mongoose.model('Project', projectSchema);

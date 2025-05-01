@@ -1,0 +1,52 @@
+.admin-dashboard {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.admin-dashboard h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.logout-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+.team-list-section {
+    margin-top: 2rem;
+}
+
+.team-list {
+    list-style: none;
+    padding: 0;
+}
+
+.team-item {
+    background-color: #fff;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.team-item h3 {
+    margin-top: 0;
+}
+
+.loading, .error {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+}
+
+.error {
+    color: red;
+}

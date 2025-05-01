@@ -33,9 +33,14 @@ app.use('/api/auth', authRoutes);
 const teamRoutes = require('./routes/teamRoutes');
 app.use('/api/team', teamRoutes); // Changed base path to singular '/api/team' to match route comments
 
-const projectRoutes = require('./routes/projectRoutes'); // Adjust path if needed
-app.use('/api', projectRoutes);
+// const projectRoutes = require('./routes/projectRoutes'); // Keep if project-specific routes exist, mount appropriately (e.g., /api/projects)
+// app.use('/api', projectRoutes); // REMOVED - Conflicted with task routes
 
+const adminRoutes = require('./routes/adminRoutes'); // Adjust path if needed
+app.use('/api/admin', adminRoutes); 
+
+const taskRoutes = require('./routes/taskRoutes'); // Add this line
+app.use('/api/tasks', taskRoutes); // Mount task routes under /api/tasks
 
 // --- Basic Test Route ---
 app.get('/', (req, res) => {
