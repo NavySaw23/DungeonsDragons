@@ -557,3 +557,24 @@
   66% { content: "..."; }
   100% { content: "."; }
 }
+
+/* Container for week display and nav buttons */
+.week-display-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* Space between buttons and week container */
+  margin-bottom: 2rem; /* Keep original bottom margin */
+}
+
+/* Adjust week container flex properties */
+.week-container {
+  flex-grow: 1; /* Allow week container to take available space */
+  /* Keep existing styles like overflow-x, etc. */
+}
+
+.week-nav-button {
+  /* Specific styling for nav buttons */
+  padding: 0.5rem 1rem;
+  flex-shrink: 0; /* Prevent buttons from shrinking */
+  white-space: nowrap; /* Prevent text wrapping */
+}

@@ -1,8 +1,10 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, RotateCcw, Coffee, Briefcase, Volume2, VolumeX } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import rainSoundFile from '../assets/Rain_sound.mp3';
 import nightSoundFile from '../assets/Night_sound.mp3';
+import lofiSoundFile from '../assets/lofi-music-1.mp3';
 import alertSoundFile from '../assets/notification.mp3';
 
 const PomodoroTimer = () => {
@@ -21,6 +23,7 @@ const PomodoroTimer = () => {
   const rainSoundRef = useRef(new Audio(rainSoundFile));
   const nightSoundRef = useRef(new Audio(nightSoundFile));
   const alertSoundRef = useRef(new Audio(alertSoundFile));
+  const lofiSoundRef = useRef(new Audio(lofiSoundFile));
 
   // Calculate progress for the circle animation
   const radius = 120;
@@ -123,35 +126,35 @@ const PomodoroTimer = () => {
   const toggleMusic = (type) => {
     setIsMusicPlaying(prev => {
       let newRain = prev.rain;
-      let newNight = prev.night;
+      let newLofi = prev.lofi;
 
       if (type === 'rain') {
         newRain = !prev.rain;
-        newNight = false;
-      } else if (type === 'night') {
-        newNight = !prev.night;
+        newLofi = false;
+      } else if (type === 'lofi') {
+        newLofi = !prev.lofi;
         newRain = false;
       }
 
       if (newRain) {
         rainSoundRef.current.loop = true;
-        rainSoundRef.current.volume = 0.5; // Set rain volume
+        rainSoundRef.current.volume = 0.5;
         rainSoundRef.current.play();
       } else {
         rainSoundRef.current.pause();
         rainSoundRef.current.currentTime = 0;
       }
 
-      if (newNight) {
-        nightSoundRef.current.loop = true;
-        nightSoundRef.current.volume = 0.5; // Set night volume
-        nightSoundRef.current.play();
+      if (newLofi) {
+        lofiSoundRef.current.loop = true;
+        lofiSoundRef.current.volume = 0.5;
+        lofiSoundRef.current.play();
       } else {
-        nightSoundRef.current.pause();
-        nightSoundRef.current.currentTime = 0;
+        lofiSoundRef.current.pause();
+        lofiSoundRef.current.currentTime = 0;
       }
 
-      return { rain: newRain, night: newNight };
+      return { rain: newRain, lofi: newLofi };
     });
   };
 
@@ -378,20 +381,20 @@ const PomodoroTimer = () => {
         </button>
 
         <button
-          onClick={() => toggleMusic('night')}
+          onClick={() => toggleMusic('lofi')}
           style={{
             display: 'flex',
             alignItems: 'center',
             padding: '8px 16px',
             borderRadius: '8px',
-            backgroundColor: isMusicPlaying.night ? '#4f46e5' : '#374151', // indigo-600 : gray-700
+            backgroundColor: isMusicPlaying.lofi ? '#4f46e5' : '#374151', // indigo-600 : gray-700
             color: 'white',
             border: 'none',
             cursor: 'pointer'
           }}
         >
-          {isMusicPlaying.night ? <Volume2 style={{ marginRight: '8px' }} size={16} /> : <VolumeX style={{ marginRight: '8px' }} size={16} />}
-          Night Sounds
+          {isMusicPlaying.lofi ? <Volume2 style={{ marginRight: '8px' }} size={16} /> : <VolumeX style={{ marginRight: '8px' }} size={16} />}
+          Lofi Music
         </button>
       </div>
     </div>

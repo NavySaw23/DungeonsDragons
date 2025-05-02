@@ -48,7 +48,7 @@ router.post('/', protect, authorize('mentor'), async (req, res) => {
         }
 
         // 2. Create the new task
-        const newTask = new Task({
+        let newTaskData = {
             name,
             description,
             projectId,
@@ -57,7 +57,10 @@ router.post('/', protect, authorize('mentor'), async (req, res) => {
             deadline,
             submissionLink,
             completionStatus
-        });
+        };
+
+        // Mongoose handles undefined fields, so no need to conditionally add them unless specific logic is needed
+        const newTask = new Task(newTaskData);
 
         console.log('Task instance created, attempting save...');
         // 3. Save the task
@@ -84,6 +87,55 @@ router.post('/', protect, authorize('mentor'), async (req, res) => {
             return res.status(400).json({ success: false, msg: error.message });
         }
         res.status(500).json({ success: false, msg: 'Server error while creating task.' });
+    }
+});
+
+/**
+ * @route   GET /api/tasks
+ * @desc    Fetch all tasks or filter by query parameters (e.g., deadlineDate, projectId, assigneeId)
+ * @access  Private (Requires authentication)
+ */
+router.get('/', protect, async (req, res) => {
+    const { deadlineDate, projectId, assigneeId } = req.query;
+    let query = {};
+
+    // Filter by Project ID
+    if (projectId) {
+        if (!mongoose.Types.ObjectId.isValid(projectId)) {
+            return res.status(400).json({ success: false, msg: 'Invalid Project ID format.' });
+        }
+        query.projectId = projectId;
+    }
+
+    // Filter by Assignee ID
+    if (assigneeId) {
+        if (!mongoose.Types.ObjectId.isValid(assigneeId)) {
+            return res.status(400).json({ success: false, msg: 'Invalid Assignee ID format.' });
+        }
+        query.assignees = assigneeId; // Check if the user ID is in the assignees array
+    }
+
+    // Filter by Deadline Date (match the specific day, ignoring time)
+    if (deadlineDate) {
+        try {
+            const date = new Date(deadlineDate); // Expecting YYYY-MM-DD format
+            const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+            const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+            query.deadline = { $gte: startOfDay, $lte: endOfDay };
+        } catch (e) {
+            return res.status(400).json({ success: false, msg: 'Invalid deadlineDate format. Use YYYY-MM-DD.' });
+        }
+    }
+
+    // Add logic here to filter tasks based on user role if necessary
+    // e.g., if req.user.role === 'student', only show tasks assigned to them (query.assignees = req.user.id)
+
+    try {
+        const tasks = await Task.find(query).populate('assignees', 'username _id').sort({ deadline: 1 }); // Sort by deadline
+        res.status(200).json({ success: true, count: tasks.length, data: tasks });
+    } catch (error) {
+        console.error("Error fetching tasks:", error);
+        res.status(500).json({ success: false, msg: 'Server error while fetching tasks.' });
     }
 });
 

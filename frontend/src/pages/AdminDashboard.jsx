@@ -145,6 +145,7 @@ function AdminDashboard() {
   };
 
   const handleRemoveTask = async (taskId, taskName) => {
+    console.log("[AdminDashboard] handleRemoveTask attempting with taskId:", taskId); // <-- Add log
     if (!window.confirm(`Are you sure you want to delete task "${taskName}" (ID: ${taskId})?`)) {
       return;
     }
@@ -163,6 +164,7 @@ function AdminDashboard() {
   };
 
   const handleMarkTaskComplete = async (taskId, taskName) => {
+    console.log("[AdminDashboard] handleMarkTaskComplete attempting with taskId:", taskId); // <-- Add log
     if (!window.confirm(`Are you sure you want to mark task "${taskName}" (ID: ${taskId}) as completed?`)) {
       return;
     }
@@ -181,6 +183,7 @@ function AdminDashboard() {
   };
 
   const handleAssignTask = async (taskId, userId) => {
+    console.log("[AdminDashboard] handleAssignTask attempting with taskId:", taskId, "userId:", userId); // <-- Add log
     if (!userId) {
       setActionError('Please select a team member to assign.');
       return;
@@ -301,6 +304,7 @@ function AdminDashboard() {
                   {/* Project Tasks */}
                   <h5>Tasks</h5>
                   {team.projectId.tasks && team.projectId.tasks.length > 0 ? (
+                    // console.log(`[AdminDashboard] Rendering tasks for Project ID: ${team.projectId._id}`, team.projectId.tasks), // Optional: Log all tasks at once
                     <ul className="task-list admin-task-list">
                       {team.projectId.tasks.map(task => (
                         <li 
@@ -308,6 +312,7 @@ function AdminDashboard() {
                           className="task-item admin-task-item"
                           data-difficulty={task.difficulty || 'medium'}
                         >
+                          {console.log("[AdminDashboard] Rendering Task Item:", task)} {/* <-- Log each task object */}
                           <div className="task-info">
                             <p>
                               {renderStatusIndicator(task.completionStatus)}

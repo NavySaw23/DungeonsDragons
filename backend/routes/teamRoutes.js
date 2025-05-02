@@ -12,8 +12,25 @@ const Project = require('../models/Project'); // Import Project model
 router.get('/me', protect, async (req, res) => {
   try {
     const team = await Team.findOne({ members: req.user._id })
-      .populate('members', 'username email role playerClass') // Added playerClass
-      .populate('projectId', 'name description'); // Populate project details
+      .populate([
+        { path: 'members', select: 'username email role playerClass health maxHealth' }, // Include health/maxHealth
+        { path: 'teamLeadId', select: 'username _id' },
+        { path: 'mentorId', select: 'username _id' },     // Populate mentor
+        { path: 'coordinatorId', select: 'username _id' }, // Populate coordinator
+        {
+          path: 'projectId', // Populate the project reference
+          select: 'name description _id tasks', // Select fields from the Project
+          populate: { // Nested populate for tasks within the project
+            path: 'tasks',
+            select: 'name _id description completionStatus assignees deadline difficulty submissionLink', // Select fields from Task
+            populate: { // Nested populate for assignees within each task
+              path: 'assignees',
+              select: 'username _id' // Select fields from User (assignee)
+            }
+          }
+        }
+      ])
+      .lean(); // Use lean for performance, especially with deep population
 
     if (!team) {
       console.log('User is not part of any team'); // Debug log
