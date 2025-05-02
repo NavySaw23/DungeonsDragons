@@ -57,6 +57,7 @@ function Dashboard() {
   const [projectDescription, setProjectDescription] = useState(''); // State for project description input
   const [actionSuccess, setActionSuccess] = useState('');
   const [showAddRoleModal, setShowAddRoleModal] = useState(false); // State for Add Role modal
+  const [showInviteModal, setShowInviteModal] = useState(false); // State for Invite Teammate modal
   const [copiedTimeoutId, setCopiedTimeoutId] = useState(null); // For copy feedback timeout
   const [copiedStatus, setCopiedStatus] = useState({}); // To track which button shows "Copied!"
 
@@ -243,12 +244,12 @@ function Dashboard() {
                   <div className="members-header">
                     <h2 className="team-name">
                       {teamData.name}
-                      <button 
-                        className="copy-icon" 
-                        onClick={() => copyToClipboard(teamData.name, 'teamName')}
-                        title="Copy team name"
+                      <button
+                        className="invite-icon" // Changed class name
+                        onClick={() => setShowInviteModal(true)} // Open invite modal
+                        title="Invite Teammate" // Updated title
                       >
-                        {copiedStatus['teamName'] || '⎘'}
+                        + {/* Changed icon */}
                       </button>
                     </h2>
                     {/* Project Display/Add Button */}
@@ -471,18 +472,50 @@ function Dashboard() {
             <p className="modal-instruction">
               Provide the following Team ID to your Mentor or Coordinator and ask them to add themselves to your team:
             </p>
+            {/* Display the Team ID separately */}
             <div className="team-id-display">
               <span className="team-id-text">{teamData._id}</span>
+            </div>
+            {/* Place both buttons inside the modal-buttons container */}
+            <div className="modal-buttons">
               <button
-                className="copy-id-btn"
+                className="modal-copy-id" // Use the class styled for modal buttons
                 onClick={() => copyToClipboard(teamData._id, 'teamId')}
                 title="Copy Team ID"
               >
                 {copiedStatus['teamId'] || 'Copy ID 📋'}
               </button>
-            </div>
-            <div className="modal-buttons">
+              {/* Separate Close button */}
               <button type="button" className="modal-cancel" onClick={() => setShowAddRoleModal(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Invite Teammate Modal */}
+      {showInviteModal && teamData && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Invite Teammate</h3>
+            <p className="modal-instruction">
+              Share the Team ID below with your teammates and ask them to use the 'Join Team' button on their dashboard.
+            </p>
+            {/* Display the Team ID */}
+            <div className="team-id-display">
+              <span className="team-id-text">{teamData._id}</span>
+            </div>
+            {/* Modal Buttons */}
+            <div className="modal-buttons">
+              <button
+                className="modal-copy-id"
+                onClick={() => copyToClipboard(teamData._id, 'inviteTeamId')} // Use a unique ID for copy status
+                title="Copy Team ID"
+              >
+                {copiedStatus['inviteTeamId'] || 'Copy ID 📋'}
+              </button>
+              <button type="button" className="modal-cancel" onClick={() => setShowInviteModal(false)}>
                 Close
               </button>
             </div>

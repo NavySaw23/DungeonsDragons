@@ -106,7 +106,8 @@
   font-weight: 600;
 }
 
-.copy-icon {
+/* Renamed from .copy-icon */
+.invite-icon {
   background: none;
   border: none;
   color: #3498db;
@@ -118,7 +119,7 @@
   align-items: center;
 }
 
-.copy-icon:hover {
+.invite-icon:hover {
   color: #2980b9;
   transform: scale(1.1);
 }
@@ -367,12 +368,25 @@
 .modal-buttons {
   display: flex;
   gap: 10px;
+  /* Align buttons to the center */
   justify-content: center;
 }
 
 .modal-submit, .modal-cancel {
   padding: 10px 20px;
   border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+/* Style for the Copy ID button in the modal */
+.modal-copy-id {
+  padding: 10px 20px;
+  border: 1px solid #555; /* Style similar to cancel but distinct */
+  background: #444;      /* Slightly different background */
+  color: white;
   border-radius: 5px;
   cursor: pointer;
   font-weight: 600;
@@ -387,6 +401,11 @@
 .modal-cancel {
   background: #555;
   color: white;
+}
+
+.modal-copy-id:hover {
+  background: #555; /* Darken on hover */
+  border-color: #666;
 }
 
 .modal-submit:hover {
@@ -409,6 +428,21 @@
   text-align: center;
 }
 
+/* Styles for the Team ID display area in the Add Role modal */
+.team-id-display {
+  background-color: #333; /* Dark background for contrast */
+  padding: 15px 20px;
+  border-radius: 5px;
+  margin-bottom: 20px; /* Space before the buttons */
+  text-align: center; /* Center the ID text */
+  border: 1px solid #444;
+}
+
+.team-id-text {
+  font-family: 'Courier New', Courier, monospace; /* Monospaced font for ID */
+  font-size: 1.1rem;
+  color: #e0e0e0; /* Light grey color */
+}
 /* Loading and Error States */
 .loading {
   display: flex;
